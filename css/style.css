@@ -369,6 +369,42 @@ kbd{
   100%{ transform:scaleY(1); filter:brightness(1) }
 }
 
+/* ── the story chapter flip ───────────────────────────────── */
+.screen{
+  transition: background .7s ease, box-shadow .7s ease;
+}
+.screen.chapter-flash{
+  animation: chapterFlash .55s ease-out;
+}
+@keyframes chapterFlash{
+  0%{ filter:brightness(2.2) saturate(1.3) }
+  55%{ filter:brightness(1.15) }
+  100%{ filter:brightness(1) }
+}
+
+/* ── persian mode ─────────────────────────────────────────── */
+body[data-lang="fa"]{
+  font-family: "Vazirmatn", "IRANSans", "Vazir", Tahoma, "Segoe UI", system-ui, sans-serif;
+}
+body[data-lang="fa"] .term{
+  font-size:clamp(16px, .8vw + 9px, 22px);
+  line-height:1.62;
+}
+body[data-lang="fa"] .line{ text-align:start; }
+body[data-lang="fa"] .line.tight{
+  direction:ltr;
+}
+body[data-lang="fa"] .grid2{
+  direction:rtl;
+  grid-template-columns:max-content 1fr;
+  text-align:right;
+}
+body[data-lang="fa"] .grid2 .k{ text-align:right; }
+body[data-lang="fa"] .game-head,
+body[data-lang="fa"] .editor{ direction:rtl; }
+body[data-lang="fa"] .prompt{ unicode-bidi:plaintext; }
+body[data-lang="fa"] .caret{ vertical-align:-4px; }
+
 @media (max-width:760px){
   .monitor{ width:96vw; padding:9px 9px 7px; border-radius:16px; }
   .screen{ height:clamp(300px, 66vh, 560px); }
