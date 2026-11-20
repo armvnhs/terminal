@@ -246,69 +246,21 @@ export const SECRETS = [
   },
 ];
 
-/* ── persian versions of the thirty questions ────────────── */
-const FA_MEM = {
-  name: { title: 'اسم', q: 'شروع آسان: اسم کوچک من چیست؟', memory: 'آرمان. اولین کلمه‌ی کل این داستان.', hint: 'شش حرف. با ا شروع می‌شود.', a: ['آرمان'] },
-  surname: { title: 'فامیل', q: 'و فامیلی که بعدش می‌آید؟', memory: 'حق‌شناس. دو کلمه، یک خانواده، کلی چای.', hint: 'دو کلمه: حقیقت، و کسی که آن را می‌داند.', a: ['حق شناس', 'حق‌شناس'] },
-  fullname: { title: 'اسم کامل', q: 'اسم کامل من را یک‌نفس بگو.', memory: 'آرمان حق‌شناس — روی هر دفتر طراحی از ۲۰۰۱.', hint: 'اسم کوچک و فامیلی، بی‌چیز اضافه.', a: ['آرمان حق شناس', 'آرمان حق‌شناس'] },
-  country: { title: 'کشور', q: 'از کدام کشور آمده‌ام؟', memory: 'ایران. نور آن‌جا از هر صفحه‌ای گرم‌تر است.', hint: 'بین عراق و افغانستان.', a: ['ایران'] },
-  nationality: { title: 'ایرانی', q: 'از نظر پاسپورت چه هستم؟', memory: 'ایرانی، و هیچ‌وقت خسته از توضیح دادن.', hint: 'نام کشور، به‌اضافه‌ی «ی».', a: ['ایرانی'] },
-  city: { title: 'اصفهان', q: 'وقتی می‌پرسند اهل کجایی، کدام شهر را می‌گویم؟', memory: 'اصفهان. نصف جهان، می‌گویند، و دروغ نمی‌گویند.', hint: 'کاشی آبی، سی‌وسه پل.', a: ['اصفهان'] },
-  live: { title: 'شاهین‌شهر', q: 'و الان در کدام شهر کوچک‌تر زندگی می‌کنم؟', memory: 'شاهین‌شهر. آرام، پانزده دقیقه تا اصفهان، خوب برای کشیدن.', hint: 'یعنی «شاه شهر». دو کلمه.', a: ['شاهین شهر', 'شاهینشهر', 'شاهین‌شهر'] },
-  province: { title: 'استان', q: 'این دو شهر در کدام استان‌اند؟', memory: 'هم‌نام با شهر. این کشور همه‌چیز را ساده نگه می‌دارد.', hint: 'همان اسمی که قبلاً گفتی.', a: ['اصفهان'] },
-  brotherwho: { title: 'رادمان', q: 'رادمان برای من کیست؟', memory: 'رادمان. برادرم. تنها کسی که اجازه دارد ددلاین را قطع کند.', hint: 'دوست نیست. پسرخاله نیست. خانواده است.', a: ['برادر', 'برادرم'] },
-  brothername: { title: 'برادر', q: 'برعکسش: اسم برادرم چیست؟', memory: 'رادمان — دو حرف از اسم من، و هیچ شبیه من.', hint: 'با ر شروع می‌شود، شش حرف.', a: ['رادمان'] },
-  brotherback: { title: 'نامدار', q: 'اسم برادرم را برعکس بنویس.', memory: 'رادمان برعکس می‌شود نامدار. هنوز از این کار بدم می‌آید.', hint: 'ر-ا-د-م-ا-ن، از آخر.', a: ['نامدار'] },
-  year: { title: '۲۰۰۱', q: 'در چه سالی به دنیا آمدم؟', memory: '۲۰۰۱. سال خوبی برای رسیدن یک طراح.', hint: 'دو هزار و ...', a: ['2001', '۲۰۰۱'] },
-  month: { title: 'جولای', q: 'چه ماهی؟ وسط تابستان بود.', memory: 'جولای. گرم‌ترین ماه، که خیلی چیزها را توضیح می‌دهد.', hint: 'ماه هفتم میلادی.', a: ['جولای', 'ژوئیه'] },
-  day: { title: 'بیست‌وهشتم', q: 'کدام روز از آن ماه؟', memory: 'بیست‌وهشتم. دو رقمی که هزار بار نوشته‌ام.', hint: 'یک روز قبل از ۲۹.', a: ['28', '۲۸', 'بیست و هشتم'] },
-  birthday: { title: 'تاریخ کامل', q: 'تاریخ کامل: روز، ماه، سال.', memory: '۲۸ جولای ۲۰۰۱. اسد، ظاهراً.', hint: 'سه تکه. هر سه را می‌دانی.', a: ['28 جولای 2001', '۲۸ جولای ۲۰۰۱', '28 july 2001'] },
-  age: { title: 'بیست‌وپنج', q: 'در ۲۰۲۶ چند ساله‌ام؟', memory: 'بیست‌وپنج، و هنوز توضیح می‌دهم گرافیک دیزاین «لوگو ساختن» نیست.', hint: '۲۰۲۶ منهای ۲۰۰۱.', a: ['25', '۲۵', 'بیست و پنج'] },
-  job: { title: 'گرافیک دیزاینر', q: 'شغلم چیست؟', memory: 'گرافیک دیزاینر. تایپ، گرید، رنگ و یک بحث خوب.', hint: 'دو کلمه. اولی با گ شروع می‌شود.', a: ['گرافیک دیزاینر', 'طراح گرافیک', 'دیزاینر'] },
-  field: { title: 'گرافیک دیزاین', q: 'و آن رشته، در دو کلمه؟', memory: 'گرافیک دیزاین: کارِ اجتناب‌ناپذیر کردن چیزها.', hint: 'نه نقاشی. نه معماری.', a: ['گرافیک دیزاین', 'گرافیک'] },
-  tea: { title: 'چای', q: 'همیشه کنار کیبورد من چیست؟', memory: 'چای. داغ، پررنگ، و همیشه سرد تمام می‌شود.', hint: 'قهوه نه. هیچ‌وقت قهوه.', a: ['چای'] },
-  glasses: { title: 'عینک', q: 'قبل از دیدن هر چیزی چه می‌گذارم؟', memory: 'عینک. بدون آن، کرنینگ فقط یک پیشنهاد است.', hint: 'دو عدسی و یک فریم.', a: ['عینک'] },
-  lotr: { title: 'ارباب حلقه‌ها', q: 'کدام سه‌گانه را خط‌به‌خط از حفظ‌ام؟', memory: 'ارباب حلقه‌ها. هنوز زمان را با سال‌های شایر می‌شمارم.', hint: 'یک حلقه. سه فیلم. نیوزیلند.', a: ['ارباب حلقه ها', 'ارباب حلقه‌ها', 'lord of the rings'] },
-  marvel: { title: 'مارول', q: 'و کدام جهان را هیچ‌وقت جا نمی‌اندازم؟', memory: 'مارول. از فیلم‌های بدش هم دفاع می‌کنم. این وفاداری است.', hint: 'دی‌سی نه.', a: ['مارول'] },
-  daredevil: { title: 'دردویل', q: 'شخصیت محبوبم در آن جهان کیست؟', memory: 'دردویل. مردی نابینا که بهتر از همه می‌بیند. طبیعی است.', hint: 'وکیل روز، ماسک قرمز شب.', a: ['دردویل'] },
-  matt: { title: 'مت مأرداک', q: 'اسم واقعی‌اش چیست؟', memory: 'مت مأرداک. هلز کیچن محله‌ی خوب شهر نیست.', hint: 'اسم کوچک مت. فامیل با م.', a: ['مت مأرداک', 'مت مورداک', 'مأرداک'] },
-  kitchen: { title: 'هلز کیچن', q: 'از کدام محله محافظت می‌کند؟', memory: 'هلز کیچن. جایی که نرفته‌ام و خوب می‌شناسم.', hint: 'به نام آشپزخانه، در منهتن.', a: ['هلز کیچن'] },
-  language: { title: 'فارسی', q: 'با چه زبانی فکر می‌کنم؟', memory: 'فارسی. زبان شعر و چانه‌زنی آرام.', hint: 'همان زبانی که همین حالا می‌خوانی.', a: ['فارسی', 'persian'] },
-  initials: { title: 'آ.ح.', q: 'حروف اول اسمم چیست؟', memory: 'آ.ح. دو حرفی که هزار بار امضا کرده‌ام.', hint: 'حرف اول اسم و فامیل.', a: ['آح', 'ا ح', 'ah'] },
-  halfworld: { title: 'نصف جهان', q: 'اصفهان یک لقب معروف دارد. چه؟', memory: 'اصفهان نصف جهان است. نصف دیگر هنوز رندر می‌شود.', hint: '«اصفهان ... جهان است.»', a: ['نصف جهان'] },
-  siblings: { title: 'یک برادر', q: 'چند خواهر و برادر دارم؟', memory: 'یک برادر. کافی برای اینکه خانه پرصدا و صادق بماند.', hint: 'اسم‌هایی که تا حالا گفتی را بشمار.', a: ['یک', 'یک برادر'] },
-  pen: { title: 'خودکار', q: 'آخرین و آسان‌ترین: چه چیزی موقع کار از دستم دور نیست؟', memory: 'خودکار. صفحه برای خروجی است؛ ایده از کاغذ شروع می‌شود.', hint: 'جوهر می‌گذارد، پیکسل نه.', a: ['خودکار', 'مداد', 'قلم'] },
-};
-
-/** Merge the persian fields for the active language */
-export function loc(secret, lang = 'en') {
-  if (!secret) return secret;
-  const fa = FA_MEM[secret.id];
-  if (lang !== 'fa' || !fa) return secret;
-  return { ...secret, ...fa, a: [...secret.a, ...(fa.a || [])] };
-}
-
 /* ── answer matching ─────────────────────────────────────── */
-const toAsciiDigits = (s) => s.replace(/[\u06f0-\u06f9]/g, (d) => String(d.charCodeAt(0) - 0x06f0));
-
-const norm = (s) => toAsciiDigits(String(s == null ? '' : s))
+const norm = (s) => String(s == null ? '' : s)
   .toLowerCase()
-  .replace(/[\u200c\u200e\u200f]/g, ' ')
-  .replace(/[ي]/g, 'ی')
-  .replace(/[ك]/g, 'ک')
   .replace(/[\u2019'`\u00b4]/g, '')
-  .replace(/[^\p{L}\p{N}]+/gu, ' ')
+  .replace(/[^a-z0-9]+/g, ' ')
   .trim()
   .replace(/^(?:i am|im|it is|its|the|a|an|my)\s+/, '')
   .trim();
 
 const squash = (s) => norm(s).replace(/\s+/g, '');
 
-export function matches(secret, text, lang = 'en') {
+export function matches(secret, text) {
   const n = norm(text);
   if (!n) return false;
-  const target = loc(secret, lang);
-  return target.a.some((ans) => norm(ans) === n || squash(ans) === squash(text));
+  return secret.a.some((ans) => norm(ans) === n || squash(ans) === squash(text));
 }
 
 /* ── progress storage ────────────────────────────────────── */
@@ -353,9 +305,9 @@ export function allFound() {
 }
 
 /** Check an answer for one specific question and unlock it if right */
-export function submitAnswer(secret, text, lang = 'en') {
+export function submitAnswer(secret, text) {
   if (isFound(secret.id)) return { already: true, ok: false, count: foundCount(), total: SECRETS.length };
-  if (!matches(secret, text, lang)) return { ok: false, already: false, count: foundCount(), total: SECRETS.length };
+  if (!matches(secret, text)) return { ok: false, already: false, count: foundCount(), total: SECRETS.length };
   const found = loadFound();
   found.push(secret.id);
   saveFound(found);
@@ -364,9 +316,9 @@ export function submitAnswer(secret, text, lang = 'en') {
 }
 
 /** Someone typed a fact instead of a command: find the question it answers */
-export function findByAnswer(text, lang = 'en') {
+export function findByAnswer(text) {
   for (const secret of SECRETS) {
-    if (!isFound(secret.id) && matches(secret, text, lang)) return secret;
+    if (!isFound(secret.id) && matches(secret, text)) return secret;
   }
   return null;
 }

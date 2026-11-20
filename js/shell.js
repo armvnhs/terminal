@@ -4,12 +4,11 @@ import { FS } from './fs.js';
 import { GAMES } from './games.js';
 import { cowsay, banner, neofetch, dice, FORTUNES, JOKES, EIGHTBALL, WEATHER } from './art.js';
 import * as fun from './fun.js';
+import { playStory } from './story.js';
 import {
   SECRETS, foundIds, foundCount, totalSecrets, pendingSecrets, submitAnswer,
-  findByAnswer, isFound, allFound, dadPresent, dadArrives, resetSecrets, loc,
+  findByAnswer, isFound, allFound, dadPresent, dadArrives, resetSecrets,
 } from './secrets.js';
-import { setLang, isFa, t, canonicalCommand, faLabel, faDesc } from './i18n.js';
-import { playStory } from './story.js';
 
 export const COMMANDS = {};
 export const THEMES = ['amber', 'green', 'ice', 'magenta', 'bone'];
@@ -460,37 +459,13 @@ def(['clear', 'cls'], 'clear the screen', 'clear', (args, io) => io.clear());
 
 def(['help'], 'show all help', 'help [command]', (args, io) => {
   if (args[0]) {
-    const c = COMMANDS[canonicalCommand(args[0])];
-    if (!c) { io.print(`help: ${args[0]}: unknown command`, 'err'); return; }
-    io.print(`  ${isFa() ? faLabel(c.name) : c.name}  (${c.name})`, 'bright');
-    io.print(`  ${(isFa() && faDesc(c.name)) || c.desc}`);
+    const c = COMMANDS[args[0]];
+    if (!c) { io.print(`help: unknown command "${args[0]}"`, 'err'); return; }
+    io.print(`  ${c.name}`, 'bright');
+    io.print(`  ${c.desc}`);
     io.print(`  usage: ${c.usage}`, 'dim');
     return;
   }
-
-  if (isFa()) {
-    io.html(`<div class="line" style="margin-bottom:6px">همه‌ی کارهای یک ترمینال واقعی اینجا هست: پوشه، فایل، پایپ (<code>|</code>)، ریدایرکت (<code>&gt;</code>)، ویرایشگر، متغیر محیطی، تم. و سی خاطره از یک طراح خاص داخلش قفل است.</div>`);
-    const groups = [
-      ['فایل و پوشه', ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'tree', 'nano']],
-      ['متن و ابزار', ['echo', 'grep', 'wc', 'sort', 'uniq', 'rev', 'calc', 'history', 'alias', 'export', 'env']],
-      ['سیستم', ['whoami', 'hostname', 'user', 'id', 'uname', 'date', 'uptime', 'ps', 'df', 'du', 'free', 'ping', 'curl', 'which', 'man', 'clear']],
-      ['ظاهر', ['theme', 'palette', 'rainbow', 'banner']],
-      ['بازی‌ها', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
-      ['سی خاطره', ['ask', 'secrets', 'hint', 'father']],
-      ['داستان و زبان', ['story', 'english']],
-    ];
-    for (const [title, names] of groups) {
-      const rows = names
-        .filter((n) => COMMANDS[n])
-        .map((n) => `<span class="k">${faLabel(n)}</span><span class="v">${faDesc(n) || COMMANDS[n].desc}</span>`)
-        .join('');
-      io.html(`<div class="line" style="margin-top:8px"><span class="bright">${title}</span></div><div class="grid2">${rows}</div>`);
-    }
-    io.html(`<div class="line dim" style="margin-top:6px">مثال: ls -l · cat README.md | grep amber · داستان · بپرس</div>`);
-    io.html(`<div class="line dim">هر دستور را انگلیسی هم بنویسی کار می‌کند. برای برگشتن: english</div>`);
-    return;
-  }
-
   io.html(`<div class="line" style="margin-bottom:6px">Everything a real terminal does happens here too: folders, files, pipes (<code>|</code>), redirects (<code>&gt;</code>), an editor, environment variables, themes. And thirty memories of a certain designer are locked inside it.</div>`);
 
   const groups = [
@@ -500,7 +475,7 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
     ['LOOKS', ['theme', 'palette', 'rainbow', 'banner']],
     ['GAMES', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
     ['THE 30 MEMORIES', ['ask', 'secrets', 'hint', 'father']],
-    ['STORY & LANGUAGE', ['story', 'persian']],
+    ['STORY', ['story']],
   ];
   for (const [title, names] of groups) {
     const rows = names
@@ -509,7 +484,7 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
       .join('');
     io.html(`<div class="line" style="margin-top:8px"><span class="bright">${title}</span></div><div class="grid2">${rows}</div>`);
   }
-  io.html(`<div class="line dim" style="margin-top:6px">Example: ls -l · cat README.md | grep amber · echo "hello" &gt; note.txt · ask · story</div>`);
+  io.html(`<div class="line dim" style="margin-top:6px">Example: ls -l · cat README.md | grep amber · echo "hello" &gt; note.txt · ask</div>`);
 });
 
 /* ── theme and sound ─────────────────────────────────────── */
@@ -529,9 +504,9 @@ def(['sound'], 'typing sound', 'sound [on|off]', (args, io) => {
   const mode = args[0];
   if (mode === 'on' || mode === 'off') {
     io.term.setSound(mode === 'on');
-    io.print(t(`typing sound: ${mode === 'on' ? 'on' : 'off'}`, `صدای تایپ: ${mode === 'on' ? 'روشن' : 'خاموش'}`), 'ok');
+    io.print(`typing sound: ${mode === 'on' ? 'on' : 'off'}`, 'ok');
   } else {
-    io.print(t(`typing sound: ${io.term.sound ? 'on' : 'off'}  (sound on/off)`, `صدای تایپ: ${io.term.sound ? 'روشن' : 'خاموش'}  (صدا روشن/خاموش)`), 'dim');
+    io.print(`typing sound: ${io.term.sound ? 'on' : 'off'}  (sound on/off)`, 'dim');
   }
 });
 
@@ -574,23 +549,8 @@ for (const [key, game] of Object.entries(GAMES)) {
   });
 }
 
-/* ── language and story ──────────────────────────────────── */
-def(['persian', 'fa', 'farsi', 'فارسی'], 'switch the whole terminal to persian', 'persian', (args, io) => {
-  setLang('fa', io.term);
-  io.print('  زبان ترمینال فارسی شد. از اینجا همه‌چیز فارسی است.', 'ok');
-  io.print('  دستورها را هم می‌توانی فارسی بنویسی: فهرست، پوشه، کمک، داستان، بپرس، رازها، تم، صدا.', 'dim');
-  io.print('  برای برگشتن به انگلیسی: english', 'dim');
-  io.term.refreshPrompt();
-});
-
-def(['english', 'en', 'انگلیسی'], 'back to english', 'english', (args, io) => {
-  setLang('en', io.term);
-  io.print('terminal language: english', 'ok');
-  io.print('  type "help" for the command list. type "persian" to come back.', 'dim');
-  io.term.refreshPrompt();
-});
-
-def(['story', 'داستان'], 'the animated story in five chapters', 'story', async (args, io) => {
+/* ── the story ───────────────────────────────────────────── */
+def(['story'], 'the animated story in five chapters', 'story', async (args, io) => {
   await playStory(io.term);
 });
 
@@ -598,56 +558,47 @@ def(['story', 'داستان'], 'the animated story in five chapters', 'story', a
 let currentSecret = null;
 let misses = 0;
 
-const view = (secret) => loc(secret, isFa() ? 'fa' : 'en');
-
 function finale(io) {
   io.print('');
   io.print('  ------------------------------------------', 'dim');
   io.print('  30 / 30', 'ok');
   io.print('');
-  io.print(t('  You made it, my son.', '  موفق شدی، پسرم.'), 'bright');
-  io.print(t('  Surely you are one of the saved.', '  قطعاً تو یکی از رستگارانی.'), 'bright');
+  io.print('  You made it, my son.', 'bright');
+  io.print('  Surely you are one of the saved.', 'bright');
   io.print('');
-  io.print(t('  Close the lid. Go and draw something.', '  درِ دستگاه را ببند. برو یک چیزی بکش.'), 'dim');
+  io.print('  Close the lid. Go and draw something.', 'dim');
   io.print('  ------------------------------------------', 'dim');
 }
 
 function unlockMsg(io, secret, res) {
-  const s = view(secret);
   io.print('');
-  io.print(`  ${t('MEMORY', 'خاطره')} ${res.count}/${res.total} ${t('UNLOCKED', 'باز شد')} - ${s.title}`, 'ok');
-  io.print(`  ${s.memory}`, 'bright');
+  io.print(`  MEMORY ${res.count}/${res.total} UNLOCKED - ${secret.title}`, 'ok');
+  io.print(`  ${secret.memory}`, 'bright');
   if (res.all) finale(io);
 }
 
 function dadScene(io) {
   dadArrives();
   io.print('');
-  io.print(t('  You called out: "Father."', '  صدایش زدی: «پدر.»'), 'bright');
+  io.print('  You called out: "Father."', 'bright');
   io.print('');
-  io.print(t('  A chair scrapes the floor. He sits down beside you,', '  صندلی روی زمین کشیده می‌شود. کنارت می‌نشیند،'));
-  io.print(t('  looks at the amber screen, and nods slowly.', '  به صفحه‌ی کهربایی نگاه می‌کند و آرام سر تکان می‌دهد.'));
+  io.print('  A chair scrapes the floor. He sits down beside you,');
+  io.print('  looks at the amber screen, and nods slowly.');
   io.print('');
-  io.print(t('  FATHER: "Thirty memories locked in a machine. Fine.', '  پدر: «سی خاطره در یک ماشین قفل شده. خوب.'));
-  io.print(t('       I am not going anywhere. Call me when you are stuck."', '       جایی نمی‌روم. هر وقت گیر کردی صدام کن.»'));
+  io.print('  FATHER: "Thirty memories locked in a machine. Fine.');
+  io.print('       I am not going anywhere. Call me when you are stuck."');
   io.print('');
-  io.print(t('  He is sitting there now. Type "father" for help with a question.', '  حالا همان‌جا نشسته است. برای کمک بنویس: پدر'), 'dim');
+  io.print('  He is sitting there now. Type "father" for help with a question.', 'dim');
   io.print('');
 }
 
 function dadHint(io, secret) {
   if (!secret) return;
-  const s = view(secret);
-  const answer = s.a[0];
+  const answer = secret.a[0];
   const words = answer.split(/\s+/).length;
-  const letters = answer.replace(/[^\p{L}\p{N}]/gu, '').length;
-  if (isFa()) {
-    io.print(`  پدر: «با «${answer[0]}» شروع می‌شود. ${words} کلمه، ${letters} حرف.»`, 'bright');
-    io.print(`  پدر: «${s.hint}»`, 'dim');
-    return;
-  }
-  io.print(`  DAD: "It starts with ${answer[0].toUpperCase()}. ${words} word${words > 1 ? 's' : ''}, ${letters} letter${letters > 1 ? 's' : ''}."`, 'bright');
-  io.print(`  DAD: "${s.hint}"`, 'dim');
+  const letters = answer.replace(/[^a-z0-9]/gi, '').length;
+  io.print(`  FATHER: "It starts with ${answer[0].toUpperCase()}. ${words} word${words > 1 ? 's' : ''}, ${letters} letter${letters > 1 ? 's' : ''}."`, 'bright');
+  io.print(`  FATHER: "${secret.hint}"`, 'dim');
 }
 
 function nextQuestion() {
@@ -658,15 +609,14 @@ function nextQuestion() {
 function askSecret(io, secret) {
   currentSecret = secret;
   misses = 0;
-  const s = view(secret);
   const n = SECRETS.indexOf(secret) + 1;
   io.print('');
-  io.print(`  ${t('QUESTION', 'سؤال')} ${n}/${SECRETS.length}`, 'dim');
-  io.print(`  ${s.q}`, 'bright');
-  io.print(t('  type your answer - Ctrl+C leaves it for later', '  جواب را بنویس — Ctrl+C برای بعد نگهش می‌دارد'), 'dim');
+  io.print(`  QUESTION ${n}/${SECRETS.length}`, 'dim');
+  io.print(`  ${secret.q}`, 'bright');
+  io.print('  type your answer - Ctrl+C leaves it for later', 'dim');
   io.term.ask((answer) => {
     if (answer === null) {
-      io.print(t('  left for later. ("ask" comes back to it.)', '  برای بعد ماند. (با بپرس برمی‌گردی سراغش.)'), 'dim');
+      io.print('  left for later. ("ask" comes back to it.)', 'dim');
       return;
     }
     handleAnswer(io, secret, answer);
@@ -674,71 +624,70 @@ function askSecret(io, secret) {
 }
 
 function handleAnswer(io, secret, answer) {
-  const res = submitAnswer(secret, answer, isFa() ? 'fa' : 'en');
-  if (res.already) { io.print(t('  that one is already open.', '  این یکی از قبل باز است.'), 'dim'); return; }
+  const res = submitAnswer(secret, answer);
+  if (res.already) { io.print('  that one is already open.', 'dim'); return; }
   if (res.ok) { misses = 0; unlockMsg(io, secret, res); return; }
 
   misses++;
-  io.print(t('  not it.', '  نه، این نیست.'), 'warn');
+  io.print('  not it.', 'warn');
   if (!dadPresent() && misses >= 3) {
     dadScene(io);
     dadHint(io, secret);
     return;
   }
   if (dadPresent()) dadHint(io, secret);
-  else io.print(t('  (try again, or "hint" for a nudge)', '  (دوباره تلاش کن، یا سرنخ را بزن)'), 'dim');
+  else io.print('  (try again, or "hint" for a nudge)', 'dim');
 }
 
-def(['ask', 'next', 'بپرس'], 'hunt the 30 memories, one question at a time', 'ask [number]', (args, io) => {
+def(['ask', 'next'], 'hunt the 30 memories, one question at a time', 'ask [number]', (args, io) => {
   if (allFound()) { finale(io); return; }
   const wanted = parseInt(args[0], 10);
   let secret = null;
   if (wanted >= 1 && wanted <= SECRETS.length) {
     const candidate = SECRETS[wanted - 1];
     if (!isFound(candidate.id)) secret = candidate;
-    else io.print(t(`  memory ${wanted} is already open.`, `  خاطره‌ی ${wanted} از قبل باز است.`), 'dim');
+    else io.print(`  memory ${wanted} is already open.`, 'dim');
   }
   if (!secret) secret = nextQuestion();
   if (!secret) { finale(io); return; }
   askSecret(io, secret);
 });
 
-def(['father', 'پدر'], 'call your father', 'father', (args, io) => {
+def(['father'], 'call your father', 'father', (args, io) => {
   if (!dadPresent()) {
     dadScene(io);
     const secret = nextQuestion();
     if (secret) dadHint(io, secret);
-    else io.print(t('  FATHER: "Nothing left to open. Look at what you built."', '  پدر: «چیزی برای باز کردن نمانده. به چیزی که ساختی نگاه کن.»'), 'bright');
+    else io.print('  FATHER: "Nothing left to open. Look at what you built."', 'bright');
     return;
   }
   const secret = nextQuestion();
-  io.print(t('  FATHER: "Still here, son."', '  پدر: «هنوز همین‌جام، پسرم.»'), 'bright');
+  io.print('  FATHER: "Still here, son."', 'bright');
   if (!secret) { finale(io); return; }
   dadHint(io, secret);
 });
 
-def(['secrets', 'memories', 'رازها'], 'the 30 memories and your progress', 'secrets', (args, io) => {
+def(['secrets', 'memories'], 'the 30 memories and your progress', 'secrets', (args, io) => {
   const found = foundIds();
   const total = totalSecrets();
   const pct = Math.round((found.length / total) * 100);
   const filled = Math.round(pct / 4);
-  io.html(`<div class="line bright">${t('30 MEMORIES LOCKED IN THIS TERMINAL', 'سی خاطره در این ترمینال قفل است')}</div>`);
-  io.html(`<div class="line">  <span class="bar">[${'█'.repeat(filled)}${'░'.repeat(25 - filled)}]</span> ${found.length}/${total} ${t('open', 'باز')} (${pct}%)</div>`);
+  io.html(`<div class="line bright">30 MEMORIES LOCKED IN THIS TERMINAL</div>`);
+  io.html(`<div class="line">  <span class="bar">[${'█'.repeat(filled)}${'░'.repeat(25 - filled)}]</span> ${found.length}/${total} open (${pct}%)</div>`);
   io.html(`<div class="grid2" style="margin-top:8px">${SECRETS.map((s, i) => {
     const got = found.includes(s.id);
-    const v = view(s);
-    return `<span class="k" style="color:${got ? 'var(--ok)' : 'var(--fg-dim)'}">${String(i + 1).padStart(2, '0')} ${got ? v.title : t('locked', 'قفل')}</span><span class="v" style="opacity:${got ? '1' : '.75'}">${got ? v.memory : v.q}</span>`;
+    return `<span class="k" style="color:${got ? 'var(--ok)' : 'var(--fg-dim)'}">${String(i + 1).padStart(2, '0')} ${got ? s.title : 'locked'}</span><span class="v" style="opacity:${got ? '1' : '.75'}">${got ? s.memory : s.q}</span>`;
   }).join('')}</div>`);
-  io.print(t('  answer with "ask", or just type what you know. Opened memories stay open.', '  با «بپرس» جواب بده، یا هرچه می‌دانی مستقیم بنویس. خاطره‌های باز، باز می‌مانند.'), 'dim');
+  io.print('  answer with "ask", or just type what you know. Opened memories stay open.', 'dim');
 });
 
-def(['hint', 'سرنخ'], 'a nudge toward the next memory', 'hint', (args, io) => {
+def(['hint'], 'a nudge toward the next memory', 'hint', (args, io) => {
   const pending = pendingSecrets();
   if (!pending.length) { finale(io); return; }
   const pick = nextQuestion();
-  io.print(`  ${view(pick).hint}`, 'warn');
+  io.print(`  ${pick.hint}`, 'warn');
   if (dadPresent()) dadHint(io, pick);
-  io.print(t(`  (${pending.length} memories still locked)`, `  (${pending.length} خاطره هنوز قفل است)`), 'dim');
+  io.print(`  (${pending.length} memories still locked)`, 'dim');
 });
 
 /* ── jokes and easter eggs ───────────────────────────────── */
@@ -949,7 +898,6 @@ function usage(cmd, io) {
 async function runTokens(tokens, io, term) {
   let name = tokens[0];
   let args = tokens.slice(1);
-  if (!COMMANDS[name] && !term.aliases[name]) name = canonicalCommand(name);
   if (term.aliases[name]) {
     const extra = tokenizeOps(term.aliases[name]);
     name = extra[0];

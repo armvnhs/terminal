@@ -2,7 +2,6 @@
 
 import { FS } from './fs.js';
 import { execute, COMMANDS } from './shell.js';
-import { isFa, t, faOut, applyLang } from './i18n.js';
 
 const LS_ENV = 'retroterm.env.v1';
 const LS_ALIAS = 'retroterm.alias.v1';
@@ -86,9 +85,9 @@ export class Terminal {
     const ed = document.createElement('div');
     ed.className = 'editor';
     ed.innerHTML = `
-      <div class="ed-head"><span id="edFile">file</span><span>${t('Ctrl+S save · Esc save &amp; exit', 'Ctrl+S ذخیره · Esc ذخیره و خروج')}</span></div>
+      <div class="ed-head"><span id="edFile">file</span><span>Ctrl+S save · Esc save &amp; exit</span></div>
       <textarea id="edText" dir="auto" spellcheck="false"></textarea>
-      <div class="ed-status" id="edStatus">${t('ready', 'آماده')}</div>`;
+      <div class="ed-status" id="edStatus">ready</div>`;
     this.screen.appendChild(ed);
     this.editorEl = ed;
     this.edText = ed.querySelector('#edText');
@@ -142,9 +141,7 @@ export class Terminal {
   /* ── input and prompt ────────────────────────────────────── */
   promptHTML() {
     if (this.askHandler) return '<span class="ps">?</span><span class="ps-sign"> </span>';
-    const user = isFa() ? 'کاربر' : this.env.USER;
-    const host = isFa() ? 'رترو' : this.env.HOST;
-    return `<span class="ps">${user}@${host}</span><span class="ps-sign">:</span><span class="ps-path">${this.shortPath()}</span><span class="ps-sign">$ </span>`;
+    return `<span class="ps">${this.env.USER}@${this.env.HOST}</span><span class="ps-sign">:</span><span class="ps-path">${this.shortPath()}</span><span class="ps-sign">$ </span>`;
   }
 
   shortPath() {
@@ -260,7 +257,6 @@ export class Terminal {
   }
 
   promptText() {
-    if (isFa()) return `کاربر@رترو:${this.shortPath()}$ `;
     return `${this.env.USER}@${this.env.HOST}:${this.shortPath()}$ `;
   }
 
@@ -485,14 +481,12 @@ export class Terminal {
       capture,
       stdin,
       print(text = '', cls = '') {
-        const out = faOut(String(text));
-        if (capture) lines.push(out);
-        else term.println(out, cls);
+        if (capture) lines.push(String(text));
+        else term.println(String(text), cls);
       },
       html(str = '') {
-        const out = faOut(String(str));
-        if (capture) lines.push(out.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
-        else term.html(out);
+        if (capture) lines.push(String(str).replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"'));
+        else term.html(str);
       },
       clear() {
         if (!capture) term.clear();
@@ -536,7 +530,7 @@ export class Terminal {
     this.editingPath = path;
     this.edFile.textContent = humanPath(abs);
     this.edText.value = node ? node.content || '' : '';
-    this.edStatus.textContent = node ? t('file opened', 'فایل باز شد') : t('new file', 'فایل جدید');
+    this.edStatus.textContent = node ? 'file opened' : 'new file';
     this.editorEl.classList.add('open');
     this.editorOpen = true;
     this.inputLine.classList.add('hidden');
@@ -568,12 +562,12 @@ export class Terminal {
     const delay = fast ? 40 : 110;
 
     const kernel = [
-      t('RetroOS 1.0 — amber phosphor terminal', 'رترو‌او‌اس ۱.۰ — ترمینال فسفر کهربایی'),
-      t('retro-kernel 1.0.0 (1984)  ·  x86_64', 'کرنل رترو ۱.۰.۰ (۱۹۸۴)  ·  x86_64'),
-      t('[  ok  ] mounting virtual filesystem on /', '[  ok  ] نصب فایل‌سیستم مجازی روی /'),
-      t('[  ok  ] loading 30 memories', '[  ok  ] بارگذاری سی خاطره'),
-      t('[  ok  ] warming phosphor at 3200K', '[  ok  ] گرم کردن فسفر روی ۳۲۰۰ کلوین'),
-      t('[  warn ] fan noise module not found', '[  warn ] ماژول صدای فن پیدا نشد'),
+      'RetroOS 1.0 — amber phosphor terminal',
+      'retro-kernel 1.0.0 (1984)  ·  x86_64',
+      '[  ok  ] mounting virtual filesystem on /',
+      '[  ok  ] loading 30 memories',
+      '[  ok  ] warming phosphor at 3200K',
+      '[  warn ] fan noise module not found',
     ];
     for (const line of kernel) {
       this.println(line, line.includes('warn') ? 'warn' : 'dim');
@@ -581,19 +575,14 @@ export class Terminal {
     }
     this.println('');
 
-    for (const boxLine of ['  ┌────────────────────────────┐', '  │  R E T R O  T E R M  1984  │', '  └────────────────────────────┘']) {
-      const el = this.println(boxLine, 'bright');
-      el.dir = 'ltr';
-    }
+    this.println('  ┌────────────────────────────┐', 'bright');
+    this.println('  │  R E T R O  T E R M  1984  │', 'bright');
+    this.println('  └────────────────────────────┘', 'bright');
     this.println('');
-    this.println(t('  A full terminal in your browser — files, folders, pipes, an editor, games and thirty memories.',
-      '  یک ترمینال کامل در مرورگر تو — فایل، پوشه، پایپ، ویرایشگر، بازی و سی خاطره.'));
-    this.println(t('  Type "help" to start. Then type "ask": thirty memories are waiting, one question at a time.',
-      '  با «کمک» شروع کن. بعد «بپرس» را بزن: سی خاطره منتظرند، سؤال به سؤال.'));
-    this.println(t('  Type "story" for the animated story in five chapters.', '  برای داستان متحرک پنج‌فصلی بنویس: داستان'));
+    this.println('  A full terminal in your browser — files, folders, pipes, an editor, games and thirty memories.');
+    this.println('  Type "help" to start. Then type "ask": thirty memories are waiting, one question at a time.');
     this.println('');
-    this.println(t(`  history: ${this.history.length} commands saved   ·   theme: ${this.theme}`,
-      `  تاریخچه: ${this.history.length} دستور   ·   تم: ${this.theme}`), 'dim');
+    this.println(`  history: ${this.history.length} commands saved   ·   theme: ${this.theme}`, 'dim');
     this.println('');
 
     this.inputLine.classList.remove('hidden');
@@ -620,7 +609,6 @@ function humanPath(abs) {
 }
 
 export async function startTerminal() {
-  applyLang();
   FS.load();
   const term = new Terminal();
   window.term = term;
