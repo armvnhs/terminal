@@ -182,7 +182,7 @@ const TEXT = {
       'The monitor settles back to amber. The chair is empty again.',
       'Thirty memories are still locked inside it. Only people who know you can open them.',
     ],
-    hints: 'ask — the thirty questions   ·   dad — help when stuck   ·   snake / ttt / guess — the games in these colours',
+    hints: 'ask — the thirty questions   ·   father — help when stuck   ·   snake / ttt / guess — the games in these colours',
   },
   fa: {
     soundOff: '  صدا خاموش است. بنویس sound on و داستان را دوباره اجرا کن تا کاملش را ببینی.',
@@ -193,7 +193,7 @@ const TEXT = {
       'مانیتور به کهربایی برمی‌گردد. صندلی دوباره خالی است.',
       'سی خاطره هنوز داخلش قفل است. فقط کسانی که تو را می‌شناسند بازش می‌کنند.',
     ],
-    hints: 'ask — سی سؤال   ·   dad — کمک وقتی گیر کردی   ·   snake / ttt / guess — بازی‌ها با همین رنگ‌ها',
+    hints: 'ask — سی سؤال   ·   پدر — کمک وقتی گیر کردی   ·   snake / ttt / guess — بازی‌ها با همین رنگ‌ها',
   },
 };
 

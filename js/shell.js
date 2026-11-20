@@ -476,7 +476,7 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
       ['سیستم', ['whoami', 'hostname', 'user', 'id', 'uname', 'date', 'uptime', 'ps', 'df', 'du', 'free', 'ping', 'curl', 'which', 'man', 'clear']],
       ['ظاهر', ['theme', 'palette', 'rainbow', 'banner']],
       ['بازی‌ها', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
-      ['سی خاطره', ['ask', 'secrets', 'hint', 'dad']],
+      ['سی خاطره', ['ask', 'secrets', 'hint', 'father']],
       ['داستان و زبان', ['story', 'english']],
     ];
     for (const [title, names] of groups) {
@@ -499,7 +499,7 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
     ['SYSTEM', ['whoami', 'hostname', 'user', 'id', 'uname', 'date', 'uptime', 'ps', 'df', 'du', 'free', 'ping', 'curl', 'which', 'man', 'clear']],
     ['LOOKS', ['theme', 'palette', 'rainbow', 'banner']],
     ['GAMES', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
-    ['THE 30 MEMORIES', ['ask', 'secrets', 'hint', 'dad']],
+    ['THE 30 MEMORIES', ['ask', 'secrets', 'hint', 'father']],
     ['STORY & LANGUAGE', ['story', 'persian']],
   ];
   for (const [title, names] of groups) {
@@ -623,15 +623,15 @@ function unlockMsg(io, secret, res) {
 function dadScene(io) {
   dadArrives();
   io.print('');
-  io.print(t('  You called out: "Dad."', '  صدایش زدی: «بابا.»'), 'bright');
+  io.print(t('  You called out: "Father."', '  صدایش زدی: «پدر.»'), 'bright');
   io.print('');
   io.print(t('  A chair scrapes the floor. He sits down beside you,', '  صندلی روی زمین کشیده می‌شود. کنارت می‌نشیند،'));
   io.print(t('  looks at the amber screen, and nods slowly.', '  به صفحه‌ی کهربایی نگاه می‌کند و آرام سر تکان می‌دهد.'));
   io.print('');
-  io.print(t('  DAD: "Thirty memories locked in a machine. Fine.', '  بابا: «سی خاطره در یک ماشین قفل شده. خوب.'));
+  io.print(t('  FATHER: "Thirty memories locked in a machine. Fine.', '  پدر: «سی خاطره در یک ماشین قفل شده. خوب.'));
   io.print(t('       I am not going anywhere. Call me when you are stuck."', '       جایی نمی‌روم. هر وقت گیر کردی صدام کن.»'));
   io.print('');
-  io.print(t('  He is sitting there now. Type "dad" for help with a question.', '  حالا همان‌جا نشسته است. برای کمک بنویس: بابا'), 'dim');
+  io.print(t('  He is sitting there now. Type "father" for help with a question.', '  حالا همان‌جا نشسته است. برای کمک بنویس: پدر'), 'dim');
   io.print('');
 }
 
@@ -642,8 +642,8 @@ function dadHint(io, secret) {
   const words = answer.split(/\s+/).length;
   const letters = answer.replace(/[^\p{L}\p{N}]/gu, '').length;
   if (isFa()) {
-    io.print(`  بابا: «با «${answer[0]}» شروع می‌شود. ${words} کلمه، ${letters} حرف.»`, 'bright');
-    io.print(`  بابا: «${s.hint}»`, 'dim');
+    io.print(`  پدر: «با «${answer[0]}» شروع می‌شود. ${words} کلمه، ${letters} حرف.»`, 'bright');
+    io.print(`  پدر: «${s.hint}»`, 'dim');
     return;
   }
   io.print(`  DAD: "It starts with ${answer[0].toUpperCase()}. ${words} word${words > 1 ? 's' : ''}, ${letters} letter${letters > 1 ? 's' : ''}."`, 'bright');
@@ -703,16 +703,16 @@ def(['ask', 'next', 'بپرس'], 'hunt the 30 memories, one question at a time',
   askSecret(io, secret);
 });
 
-def(['dad', 'father', 'بابا'], 'call your father', 'dad', (args, io) => {
+def(['father', 'پدر'], 'call your father', 'father', (args, io) => {
   if (!dadPresent()) {
     dadScene(io);
     const secret = nextQuestion();
     if (secret) dadHint(io, secret);
-    else io.print(t('  DAD: "Nothing left to open. Look at what you built."', '  بابا: «چیزی برای باز کردن نمانده. به چیزی که ساختی نگاه کن.»'), 'bright');
+    else io.print(t('  FATHER: "Nothing left to open. Look at what you built."', '  پدر: «چیزی برای باز کردن نمانده. به چیزی که ساختی نگاه کن.»'), 'bright');
     return;
   }
   const secret = nextQuestion();
-  io.print(t('  DAD: "Still here, son."', '  بابا: «هنوز همین‌جام، پسرم.»'), 'bright');
+  io.print(t('  FATHER: "Still here, son."', '  پدر: «هنوز همین‌جام، پسرم.»'), 'bright');
   if (!secret) { finale(io); return; }
   dadHint(io, secret);
 });

@@ -47,7 +47,7 @@ alias gs='git status'
   2) the small city I live in
   3) what is always next to my keyboard
 
-Type "ask" to be questioned properly. Type "dad" if you get stuck.
+Type "ask" to be questioned properly. Type "father" if you get stuck.
 `, 1),
         design: dir('design', {
           'palette.txt': file('palette.txt', `# AMBER DUSK
