@@ -575,9 +575,9 @@ export class Terminal {
     }
     this.println('');
 
-    this.println('  ┌────────────────────────────────────────────┐', 'bright');
-    this.println('  │   R E T R O   T E R M   ·   v1.0  (1984)   │', 'bright');
-    this.println('  └────────────────────────────────────────────┘', 'bright');
+    this.println('  ┌────────────────────────────┐', 'bright');
+    this.println('  │  R E T R O  T E R M  1984  │', 'bright');
+    this.println('  └────────────────────────────┘', 'bright');
     this.println('');
     this.println('  A full terminal in your browser — files, folders, pipes, an editor, games and thirty memories.');
     this.println('  Type "help" to start. Then type "ask": thirty memories are waiting, one question at a time.');

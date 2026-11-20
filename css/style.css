@@ -41,23 +41,86 @@ html,body{ height:100%; }
 body{
   margin:0;
   padding:0;
-  background:#050301;
+  min-height:100vh;
+  background:
+    radial-gradient(120% 95% at 50% 6%, #1c1613 0%, #0d0a08 52%, #050403 100%);
   color:var(--fg);
   font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "DejaVu Sans Mono", "Courier New", monospace;
   overflow:hidden;
 }
 
-/* ── the screen fills the whole viewport ───────────────────── */
-.screen{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
+/* ── room, monitor case, tube ─────────────────────────────── */
+.room{
+  min-height:100vh;
+  min-height:100dvh;
+  display:grid;
+  place-items:center;
+  padding:clamp(10px, 2.4vw, 30px);
+}
+
+.monitor{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  width:min(94vw, 980px);
+  padding:clamp(14px, 2vw, 30px) clamp(14px, 2vw, 30px) clamp(10px, 1.4vw, 18px);
+  border-radius:clamp(16px, 1.9vw, 28px);
+  border:1px solid #2b2721;
   background:
-    radial-gradient(115% 105% at 50% 42%, var(--screen-1) 0%, var(--screen-2) 58%, #080501 100%);
+    linear-gradient(155deg, #8d8577 0%, #726b5d 18%, #5b5548 46%, #4e483c 70%, #37332c 100%);
   box-shadow:
-    inset 0 0 120px rgba(0,0,0,.92),
-    inset 0 0 240px rgba(255,140,20,.10);
+    0 44px 90px rgba(0,0,0,.8),
+    0 10px 24px rgba(0,0,0,.65),
+    0 2px 0 rgba(255,255,255,.10) inset,
+    0 -8px 18px rgba(0,0,0,.5) inset;
+}
+.monitor::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-image:repeating-linear-gradient(88deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+  opacity:.7;
+  pointer-events:none;
+}
+
+.screen{
+  position:relative;
+  width:100%;
+  height:clamp(340px, 70vh, 640px);
+  overflow:hidden;
+  border-radius:clamp(10px, 1.3vw, 16px);
+  background:
+    radial-gradient(115% 110% at 50% 38%, var(--screen-1) 0%, var(--screen-2) 58%, #080501 100%);
+  box-shadow:
+    inset 0 0 70px rgba(0,0,0,.92),
+    inset 0 0 170px rgba(255,140,20,.12),
+    0 0 0 clamp(3px, .45vw, 5px) #201c17,
+    0 0 0 clamp(5px, .7vw, 8px) #0e0c09,
+    0 0 40px rgba(255,140,20,.10);
   animation: turnOn .85s ease-out both;
+}
+
+.chin{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:clamp(7px, 1.1vw, 13px) clamp(6px, 1.4vw, 18px) 0;
+  color:#2b2721;
+  font-size:clamp(8px, .8vw, 11px);
+  letter-spacing:.34em;
+  text-transform:uppercase;
+  text-shadow:0 1px 0 rgba(255,255,255,.13);
+  user-select:none;
+}
+.led{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent), 0 0 16px var(--glow);
+  animation:led 4.5s ease-in-out infinite;
 }
 
 .term{
@@ -66,11 +129,12 @@ body{
   height:100%;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:clamp(16px, 2.6vh, 34px) clamp(16px, 2.6vw, 56px) 44px;
-  font-size:clamp(13px, 1.05vw, 17.5px);
-  line-height:1.5;
+  padding:clamp(16px, 2.6vh, 28px) clamp(18px, 2.4vw, 38px) 32px;
+  font-size:clamp(16px, .85vw + 9px, 23px);
+  line-height:1.44;
+  letter-spacing:.005em;
   color:var(--fg);
-  text-shadow: 0 0 5px var(--glow), 0 0 14px rgba(255,130,20,.16);
+  text-shadow: 0 0 6px var(--glow), 0 0 18px rgba(255,130,20,.20);
   cursor:text;
   font-variant-ligatures:none;
   tab-size:4;
@@ -290,6 +354,7 @@ kbd{
 
 /* ── animations ───────────────────────────────────────────── */
 @keyframes blink{ 0%,49%{opacity:1} 50%,100%{opacity:0} }
+@keyframes led{ 0%,100%{opacity:.92} 50%{opacity:.42} }
 @keyframes flick{
   0%{ transform:translateX(-30%); opacity:0 }
   8%{ opacity:.6 }
@@ -304,9 +369,12 @@ kbd{
   100%{ transform:scaleY(1); filter:brightness(1) }
 }
 
-@media (max-width:700px){
-  .term{ padding:14px 14px 34px; font-size:13px; }
+@media (max-width:760px){
+  .monitor{ width:96vw; padding:9px 9px 7px; border-radius:16px; }
+  .screen{ height:clamp(300px, 66vh, 560px); }
+  .term{ padding:13px 13px 22px; font-size:14.5px; line-height:1.45; }
   .editor{ padding:12px 14px 16px; }
+  .chin{ padding:5px 6px 0; letter-spacing:.24em; }
 }
 
 @media (prefers-reduced-motion:reduce){

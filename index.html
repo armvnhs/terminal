@@ -10,13 +10,21 @@
 </head>
 <body data-theme="amber">
 
-  <main class="screen" id="screen">
-    <div class="term" id="term" aria-live="polite"></div>
-    <div class="scanlines" aria-hidden="true"></div>
-    <div class="vignette" aria-hidden="true"></div>
-    <div class="flicker" aria-hidden="true"></div>
-    <div class="glass" aria-hidden="true"></div>
-  </main>
+  <div class="room">
+    <div class="monitor">
+      <main class="screen" id="screen">
+        <div class="term" id="term" aria-live="polite"></div>
+        <div class="scanlines" aria-hidden="true"></div>
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="flicker" aria-hidden="true"></div>
+        <div class="glass" aria-hidden="true"></div>
+      </main>
+      <div class="chin" aria-hidden="true">
+        <span class="brand">RETRO-TERM</span>
+        <span class="led"></span>
+      </div>
+    </div>
+  </div>
 
   <input id="ghost" class="ghost-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="terminal input">
   <script type="module" src="js/main.js"></script>
