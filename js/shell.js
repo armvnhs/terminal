@@ -7,8 +7,9 @@ import * as fun from './fun.js';
 import { playStory } from './story.js';
 import {
   SECRETS, foundIds, foundCount, totalSecrets, pendingSecrets, submitAnswer,
-  findByAnswer, isFound, allFound, dadPresent, dadArrives, resetSecrets,
+  findByAnswer, findAnyAnswer, matches, isFound, allFound, dadPresent, dadArrives, resetSecrets,
 } from './secrets.js';
+import { artOf } from './emblems.js';
 
 export const COMMANDS = {};
 export const THEMES = ['amber', 'green', 'ice', 'magenta', 'bone'];
@@ -570,7 +571,15 @@ function finale(io) {
   io.print('  ------------------------------------------', 'dim');
 }
 
+function showEmblem(io, secret) {
+  const art = artOf(secret.id);
+  if (!art) return;
+  io.print('');
+  io.print(art, 'dim');
+}
+
 function unlockMsg(io, secret, res) {
+  showEmblem(io, secret);
   io.print('');
   io.print(`  MEMORY ${res.count}/${res.total} UNLOCKED - ${secret.title}`, 'ok');
   io.print(`  ${secret.memory}`, 'bright');
@@ -624,8 +633,29 @@ function askSecret(io, secret) {
 }
 
 function handleAnswer(io, secret, answer) {
+  // the answer may belong to a different question than the one being asked
+  const other = matches(secret, answer) ? null : findAnyAnswer(answer);
+  if (other && other.secret.id !== secret.id) {
+    if (other.found) {
+      showEmblem(io, other.secret);
+      io.print(`  already open: ${other.secret.title}`, 'dim');
+      io.print('  this answer belongs to that memory.', 'dim');
+      return;
+    }
+    const moved = submitAnswer(other.secret, answer);
+    if (moved.ok) {
+      io.print(`  (that was the answer to question ${SECRETS.indexOf(other.secret) + 1}, not this one)`);
+      unlockMsg(io, other.secret, moved);
+      return;
+    }
+  }
+
   const res = submitAnswer(secret, answer);
-  if (res.already) { io.print('  that one is already open.', 'dim'); return; }
+  if (res.already) {
+    showEmblem(io, secret);
+    io.print('  that one is already open. try "ask" for the next locked memory.', 'dim');
+    return;
+  }
   if (res.ok) { misses = 0; unlockMsg(io, secret, res); return; }
 
   misses++;
@@ -906,9 +936,18 @@ async function runTokens(tokens, io, term) {
   const cmd = COMMANDS[name];
   if (!cmd) {
     const line = tokens.join(' ');
-    const hit = findByAnswer(line);
+    const hit = findAnyAnswer(line);
+    if (hit && hit.found) {
+      showEmblem(io, hit.secret);
+      io.print('');
+      io.print(`  already open: ${hit.secret.title}`, 'dim');
+      io.print(`  ${hit.secret.memory}`, 'dim');
+      io.print('  try "ask" for the next locked memory.', 'dim');
+      term.lastExit = 0;
+      return;
+    }
     if (hit) {
-      unlockMsg(io, hit, submitAnswer(hit, line));
+      unlockMsg(io, hit.secret, submitAnswer(hit.secret, line));
       term.lastExit = 0;
       return;
     }

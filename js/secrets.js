@@ -315,12 +315,21 @@ export function submitAnswer(secret, text) {
   return { ok: true, already: false, count, total: SECRETS.length, all: count >= SECRETS.length };
 }
 
-/** Someone typed a fact instead of a command: find the question it answers */
-export function findByAnswer(text) {
+/** Someone typed a fact instead of a command: which memory does it belong to? */
+export function findAnyAnswer(text) {
+  const found = [];
   for (const secret of SECRETS) {
-    if (!isFound(secret.id) && matches(secret, text)) return secret;
+    if (!matches(secret, text)) continue;
+    if (!isFound(secret.id)) return { secret, found: false };
+    found.push(secret);
   }
-  return null;
+  return found.length ? { secret: found[0], found: true } : null;
+}
+
+/** Only the still-locked ones */
+export function findByAnswer(text) {
+  const hit = findAnyAnswer(text);
+  return hit && !hit.found ? hit.secret : null;
 }
 
 export function resetSecrets() {
