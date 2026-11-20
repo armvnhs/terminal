@@ -84,7 +84,7 @@ export async function hack(io) {
       await t.sleep(45);
     }
     if (stopped) break;
-    lines[i] = `  [${'█'.repeat(20)}] 100%  ${steps[i]}  ✓`;
+    lines[i] = `  [${'█'.repeat(20)}] 100%  ${steps[i]}`;
     pre.textContent = lines.filter(Boolean).join('\n');
     await t.sleep(140);
   }
@@ -116,7 +116,7 @@ export async function sl(io) {
     await t.sleep(38);
   }
   release();
-  t.print('  🚂 The train left. Type ls correctly next time.', 'dim');
+  t.print('  The train left. Type ls correctly next time.', 'dim');
 }
 
 export async function pipes(io) {
@@ -215,12 +215,12 @@ export async function shutdown(io) {
   }
   t.print('  …', 'dim');
   await t.sleep(500);
-  t.print('  Just kidding 😄 — this terminal is a filesystem in your browser, it cannot power off.', 'ok');
-  t.print('  Nice try though. +1 secret.', 'dim');
+  t.print('  Just kidding — this terminal is a filesystem in your browser, it cannot power off.', 'ok');
+  t.print('  Nice try though.', 'dim');
 }
 
 export function konami(io) {
-  io.print('  ↑  ↑  ↓  ↓  ←  →  ←  →  B  A');
+  io.print('  UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A');
   io.print('  Konami code accepted — 30 extra lives!', 'ok');
   io.print('  (lives ship in the next version. for now: good vibes.)', 'dim');
 }
@@ -241,7 +241,7 @@ export function dance(io) {
     io.print(frame);
     if (i < DANCE.length - 1) io.print('');
   });
-  io.print('  💃 Dance over. Back to the project.', 'dim');
+  io.print('  Dance over. Back to the project.', 'dim');
 }
 
 export function coffee(io) {

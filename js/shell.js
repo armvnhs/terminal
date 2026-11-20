@@ -4,7 +4,10 @@ import { FS } from './fs.js';
 import { GAMES } from './games.js';
 import { cowsay, banner, neofetch, dice, FORTUNES, JOKES, EIGHTBALL, WEATHER } from './art.js';
 import * as fun from './fun.js';
-import { SECRETS, foundIds, foundCount, totalSecrets } from './secrets.js';
+import {
+  SECRETS, foundIds, foundCount, totalSecrets, pendingSecrets, submitAnswer,
+  findByAnswer, isFound, allFound, dadPresent, dadArrives, resetSecrets,
+} from './secrets.js';
 
 export const COMMANDS = {};
 export const THEMES = ['amber', 'green', 'ice', 'magenta', 'bone'];
@@ -420,7 +423,7 @@ def(['alias'], 'define command shortcuts', 'alias [name=value]', (args, io) => {
     if (idx > 0) {
       io.term.aliases[a.slice(0, idx)] = a.slice(idx + 1);
       io.term.saveAliases();
-      io.print(`✓ alias ${a.slice(0, idx)}='${a.slice(idx + 1)}'`, 'dim');
+      io.print(`alias ${a.slice(0, idx)}='${a.slice(idx + 1)}'`, 'dim');
     } else io.print(io.term.aliases[a] ? `alias ${a}='${io.term.aliases[a]}'` : `alias: ${a}: not defined`, 'err');
   }
 });
@@ -462,15 +465,15 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
     io.print(`  usage: ${c.usage}`, 'dim');
     return;
   }
-  io.html(`<div class="line" style="margin-bottom:6px">Everything a real terminal does happens here too: folders, files, pipes (<code>|</code>), redirects (<code>&gt;</code>), an editor, environment variables, themes. And 30 secrets are hidden as well.</div>`);
+  io.html(`<div class="line" style="margin-bottom:6px">Everything a real terminal does happens here too: folders, files, pipes (<code>|</code>), redirects (<code>&gt;</code>), an editor, environment variables, themes. And thirty memories of a certain designer are locked inside it.</div>`);
 
   const groups = [
-    ['📁 FILES & DIRECTORIES', ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'tree', 'nano']],
-    ['✍️ TEXT & TOOLS', ['echo', 'grep', 'wc', 'sort', 'uniq', 'rev', 'calc', 'history', 'alias', 'export', 'env']],
-    ['🖥 SYSTEM', ['whoami', 'hostname', 'user', 'id', 'uname', 'date', 'uptime', 'ps', 'df', 'du', 'free', 'ping', 'curl', 'which', 'man', 'clear']],
-    ['🎨 LOOKS', ['theme', 'palette', 'rainbow', 'banner']],
-    ['🎮 GAMES', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
-    ['🔒 SECRETS', ['secrets', 'hint']],
+    ['FILES & DIRECTORIES', ['ls', 'cd', 'pwd', 'cat', 'head', 'tail', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'tree', 'nano']],
+    ['TEXT & TOOLS', ['echo', 'grep', 'wc', 'sort', 'uniq', 'rev', 'calc', 'history', 'alias', 'export', 'env']],
+    ['SYSTEM', ['whoami', 'hostname', 'user', 'id', 'uname', 'date', 'uptime', 'ps', 'df', 'du', 'free', 'ping', 'curl', 'which', 'man', 'clear']],
+    ['LOOKS', ['theme', 'palette', 'rainbow', 'banner']],
+    ['GAMES', ['games', 'snake', '2048', 'ttt', 'guess', 'hangman']],
+    ['THE 30 MEMORIES', ['ask', 'secrets', 'hint', 'dad']],
   ];
   for (const [title, names] of groups) {
     const rows = names
@@ -479,7 +482,7 @@ def(['help'], 'show all help', 'help [command]', (args, io) => {
       .join('');
     io.html(`<div class="line" style="margin-top:8px"><span class="bright">${title}</span></div><div class="grid2">${rows}</div>`);
   }
-  io.html(`<div class="line rtl dim" style="margin-top:6px">Example: <span dir="ltr">ls -l</span> · <span dir="ltr">cat README.md | grep amber</span> · <span dir="ltr">echo "hello" &gt; note.txt</span> · <span dir="ltr">secrets</span></div>`);
+  io.html(`<div class="line dim" style="margin-top:6px">Example: ls -l · cat README.md | grep amber · echo "hello" &gt; note.txt · ask</div>`);
 });
 
 /* ── theme and sound ─────────────────────────────────────── */
@@ -492,7 +495,7 @@ def(['theme', 'color'], 'change the phosphor theme', 'theme [amber|green|ice|mag
   const name = args[0].toLowerCase();
   if (!THEMES.includes(name)) { io.print(`theme: "${name}" not found. choose: ${THEMES.join(", ")}`, 'err'); return; }
   io.term.setTheme(name);
-  io.print(`✓ theme "${name}" enabled`, 'ok');
+  io.print(`theme "${name}" enabled`, 'ok');
 });
 
 def(['sound'], 'typing sound', 'sound [on|off]', (args, io) => {
@@ -509,11 +512,11 @@ def(['reset'], 'reset the filesystem to defaults', 'reset [--all]', (args, io) =
   FS.reset();
   io.term.cwd = FS.home;
   if (args.includes('--all')) {
-    localStorage.removeItem('retroterm.secrets.v1');
+    resetSecrets();
     io.term.setTheme('amber');
-    io.print('Everything reset: files, secrets, theme.', 'ok');
+    io.print('Everything reset: files, memories, theme.', 'ok');
   } else {
-    io.print('Filesystem restored. (secrets and theme untouched)', 'ok');
+    io.print('Filesystem restored. (memories and theme untouched)', 'ok');
   }
   io.term.refreshPrompt();
 });
@@ -531,7 +534,7 @@ def(['nano', 'edit'], 'file editor', 'nano <file>', (args, io) => {
 
 /* ── games ───────────────────────────────────────────────── */
 def(['games'], 'list the games', 'games', (args, io) => {
-  io.html(`<div class="line"><span class="bright">🎮 TERMINAL GAMES</span></div>`);
+  io.html(`<div class="line"><span class="bright">TERMINAL GAMES</span></div>`);
   io.html(`<div class="grid2">
     ${Object.entries(GAMES).map(([k, g]) => `<span class="k">${k}</span><span class="v">${g.title}</span>`).join('')}
   </div>`);
@@ -544,46 +547,153 @@ for (const [key, game] of Object.entries(GAMES)) {
   });
 }
 
-/* ── secrets ─────────────────────────────────────────────── */
-def(['secrets'], 'list the 30 hidden secrets', 'secrets', (args, io) => {
+/* ── the 30 memories ─────────────────────────────────────── */
+let currentSecret = null;
+let misses = 0;
+
+function finale(io) {
+  io.print('');
+  io.print('  ------------------------------------------', 'dim');
+  io.print('  30 / 30', 'ok');
+  io.print('');
+  io.print('  You made it, my son.', 'bright');
+  io.print('  Surely you are one of the saved.', 'bright');
+  io.print('');
+  io.print('  Close the lid. Go and draw something.', 'dim');
+  io.print('  ------------------------------------------', 'dim');
+}
+
+function unlockMsg(io, secret, res) {
+  io.print('');
+  io.print(`  MEMORY ${res.count}/${res.total} UNLOCKED - ${secret.title}`, 'ok');
+  io.print(`  ${secret.memory}`, 'bright');
+  if (res.all) finale(io);
+}
+
+function dadScene(io) {
+  dadArrives();
+  io.print('');
+  io.print('  You called out: "Dad."', 'bright');
+  io.print('');
+  io.print('  A chair scrapes the floor. He sits down beside you,');
+  io.print('  looks at the amber screen, and nods slowly.');
+  io.print('');
+  io.print('  DAD: "Thirty memories locked in a machine. Fine.');
+  io.print('       I am not going anywhere. Call me when you are stuck."');
+  io.print('');
+  io.print('  He is sitting there now. Type "dad" for help with a question.', 'dim');
+  io.print('');
+}
+
+function dadHint(io, secret) {
+  if (!secret) return;
+  const answer = secret.a[0];
+  const words = answer.split(/\s+/).length;
+  const letters = answer.replace(/[^a-z0-9]/gi, '').length;
+  io.print(`  DAD: "It starts with ${answer[0].toUpperCase()}. ${words} word${words > 1 ? 's' : ''}, ${letters} letter${letters > 1 ? 's' : ''}."`, 'bright');
+  io.print(`  DAD: "${secret.hint}"`, 'dim');
+}
+
+function nextQuestion() {
+  if (currentSecret && !isFound(currentSecret.id)) return currentSecret;
+  return pendingSecrets()[0] || null;
+}
+
+function askSecret(io, secret) {
+  currentSecret = secret;
+  misses = 0;
+  const n = SECRETS.indexOf(secret) + 1;
+  io.print('');
+  io.print(`  QUESTION ${n}/${SECRETS.length}`, 'dim');
+  io.print(`  ${secret.q}`, 'bright');
+  io.print('  type your answer - Ctrl+C leaves it for later', 'dim');
+  io.term.ask((answer) => {
+    if (answer === null) {
+      io.print('  left for later. ("ask" comes back to it.)', 'dim');
+      return;
+    }
+    handleAnswer(io, secret, answer);
+  });
+}
+
+function handleAnswer(io, secret, answer) {
+  const res = submitAnswer(secret, answer);
+  if (res.already) { io.print('  that one is already open.', 'dim'); return; }
+  if (res.ok) { misses = 0; unlockMsg(io, secret, res); return; }
+
+  misses++;
+  io.print('  not it.', 'warn');
+  if (!dadPresent() && misses >= 3) {
+    dadScene(io);
+    dadHint(io, secret);
+    return;
+  }
+  if (dadPresent()) dadHint(io, secret);
+  else io.print('  (try again, or "hint" for a nudge)', 'dim');
+}
+
+def(['ask', 'next'], 'hunt the 30 memories, one question at a time', 'ask [number]', (args, io) => {
+  if (allFound()) { finale(io); return; }
+  const wanted = parseInt(args[0], 10);
+  let secret = null;
+  if (wanted >= 1 && wanted <= SECRETS.length) {
+    const candidate = SECRETS[wanted - 1];
+    if (!isFound(candidate.id)) secret = candidate;
+    else io.print(`  memory ${wanted} is already open.`, 'dim');
+  }
+  if (!secret) secret = nextQuestion();
+  if (!secret) { finale(io); return; }
+  askSecret(io, secret);
+});
+
+def(['dad', 'father'], 'call your father', 'dad', (args, io) => {
+  if (!dadPresent()) {
+    dadScene(io);
+    const secret = nextQuestion();
+    if (secret) dadHint(io, secret);
+    else io.print('  DAD: "Nothing left to open. Look at what you built."', 'bright');
+    return;
+  }
+  const secret = nextQuestion();
+  io.print('  DAD: "Still here, son."', 'bright');
+  if (!secret) { finale(io); return; }
+  dadHint(io, secret);
+});
+
+def(['secrets', 'memories'], 'the 30 memories and your progress', 'secrets', (args, io) => {
   const found = foundIds();
   const total = totalSecrets();
   const pct = Math.round((found.length / total) * 100);
   const filled = Math.round(pct / 4);
-  io.html(`<div class="line bright">🔒 30 HIDDEN SECRETS IN THIS TERMINAL</div>`);
-  io.html(`<div class="line">  <span class="bar">[${'█'.repeat(filled)}${'░'.repeat(25 - filled)}]</span> ${found.length}/${total} found (${pct}%)</div>`);
-  io.html(`<div class="grid2" style="margin-top:8px">${SECRETS.map((s) => {
+  io.html(`<div class="line bright">30 MEMORIES LOCKED IN THIS TERMINAL</div>`);
+  io.html(`<div class="line">  <span class="bar">[${'█'.repeat(filled)}${'░'.repeat(25 - filled)}]</span> ${found.length}/${total} open (${pct}%)</div>`);
+  io.html(`<div class="grid2" style="margin-top:8px">${SECRETS.map((s, i) => {
     const got = found.includes(s.id);
-    const cmd = s.triggers[0];
-    return `<span class="k" style="color:${got ? 'var(--ok)' : 'var(--fg-dim)'}">${got ? cmd : '???'}</span>
-            <span class="v" style="opacity:${got ? '1' : '.7'}">${got ? s.title : s.hint}</span>`;
+    return `<span class="k" style="color:${got ? 'var(--ok)' : 'var(--fg-dim)'}">${String(i + 1).padStart(2, '0')} ${got ? s.title : 'locked'}</span><span class="v" style="opacity:${got ? '1' : '.75'}">${got ? s.memory : s.q}</span>`;
   }).join('')}</div>`);
-  io.html(`<div class="line rtl dim" style="margin-top:6px">Each secret registers itself when you run its command. Stuck? Type <span dir="ltr">hint</span>.</div>`);
+  io.print('  answer with "ask", or just type what you know. Opened memories stay open.', 'dim');
 });
 
-def(['hint'], 'get a random secret hint', 'hint', (args, io) => {
-  const found = foundIds();
-  const remaining = SECRETS.filter((s) => !found.includes(s.id));
-  if (!remaining.length) {
-    io.print('🏆 All 30 secrets found. You are the terminal now.', 'ok');
-    return;
-  }
-  const pick = remaining[Math.floor(Math.random() * remaining.length)];
-  io.print(`💡 ${pick.hint}`, 'warn');
-  io.print(`  (${remaining.length} left)`, 'dim');
+def(['hint'], 'a nudge toward the next memory', 'hint', (args, io) => {
+  const pending = pendingSecrets();
+  if (!pending.length) { finale(io); return; }
+  const pick = nextQuestion();
+  io.print(`  ${pick.hint}`, 'warn');
+  if (dadPresent()) dadHint(io, pick);
+  io.print(`  (${pending.length} memories still locked)`, 'dim');
 });
 
 /* ── jokes and easter eggs ───────────────────────────────── */
 def(['sudo'], 'run a command as root', 'sudo <command>', async (args, io) => {
   const full = args.join(' ').trim();
   if (full === 'make me a sandwich') {
-    io.print('Alright. 🥪', 'ok');
+    io.print('Alright. One sandwich, no crust.', 'ok');
     io.print('  (designers usually want coffee: coffee)', 'dim');
     return;
   }
   if (full === 'su' || full === 'su -' || full === '-i') {
     io.print(`[sudo] password for ${io.term.env.USER}: ********`, 'dim');
-    io.print('Sorry, user is not in the sudoers file. This incident has been reported. 😌', 'err');
+    io.print('Sorry, user is not in the sudoers file. This incident has been reported.', 'err');
     return;
   }
   if (!full) { io.print('usage: sudo <command>', 'err'); return; }
@@ -674,12 +784,12 @@ def(['coinflip', 'coin'], 'flip a coin', 'coinflip', (args, io) => {
 
 def(['8ball'], 'magic 8-ball', '8ball <question>', (args, io) => {
   const q = args.join(' ');
-  if (q) io.print(`  ❓ ${q}`, 'dim');
-  io.print('  🎱 ' + EIGHTBALL[Math.floor(Math.random() * EIGHTBALL.length)], 'bright');
+  if (q) io.print(`  Q: ${q}`, 'dim');
+  io.print('  A: ' + EIGHTBALL[Math.floor(Math.random() * EIGHTBALL.length)], 'bright');
 });
 
 def(['hello', 'hi', 'salam'], 'say hello', 'hello', (args, io) => {
-  io.print(`  Hello ${io.term.env.USER}. Welcome to the amber realm. ☕`, 'bright');
+  io.print(`  Hello ${io.term.env.USER}. Welcome to the amber realm.`, 'bright');
   io.print('  type "help", or go straight for "secrets".', 'dim');
 });
 
@@ -693,10 +803,10 @@ def(['xyzzy'], 'the magic word', 'xyzzy', (args, io) => {
 });
 
 def(['rickroll'], 'rickroll', 'rickroll', (args, io) => {
-  io.print('  ♪ Never gonna give you up');
-  io.print('  ♪ Never gonna let you down');
-  io.print('  ♪ Never gonna run around and desert you');
-  io.print('  … and you are still staring at the terminal.', 'dim');
+  io.print('  Never gonna give you up');
+  io.print('  Never gonna let you down');
+  io.print('  Never gonna run around and desert you');
+  io.print('  ... and you are still staring at the terminal.', 'dim');
 });
 
 def(['open', 'openbox'], 'open a file', 'open <file>', (args, io) => {
@@ -788,8 +898,15 @@ async function runTokens(tokens, io, term) {
   }
   const cmd = COMMANDS[name];
   if (!cmd) {
+    const line = tokens.join(' ');
+    const hit = findByAnswer(line);
+    if (hit) {
+      unlockMsg(io, hit, submitAnswer(hit, line));
+      term.lastExit = 0;
+      return;
+    }
     io.print(`retro-sh: ${name}: command not found`, 'err');
-    io.print('  try "help" or "games".', 'dim');
+    io.print('  "help" for commands, "ask" for the memories. A name or a fact might also be an answer.', 'dim');
     term.lastExit = 127;
     return;
   }
@@ -817,7 +934,7 @@ export async function execute(line, term) {
     if (!parsed.redirect.file) { term.println('retro-sh: missing redirect target', 'err'); return; }
     const r = FS.write(parsed.redirect.file, stdin ? stdin + '\n' : '', parsed.redirect.append, term.cwd);
     if (r.error) term.println(r.error, 'err');
-    else term.println(`✓ ${parsed.redirect.append ? 'appended to' : 'wrote'} ${parsed.redirect.file}`, 'dim');
+    else term.println(`${parsed.redirect.append ? 'appended to' : 'wrote'} ${parsed.redirect.file}`, 'dim');
   } else if (complex) {
     if (stdin.trim()) term.println(stdin.replace(/\n$/, ''));
   }

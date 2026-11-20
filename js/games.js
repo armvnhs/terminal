@@ -83,9 +83,9 @@ async function snake(io) {
   });
 
   release();
-  if (quit && !dead) t.print('Game abandoned. 🐍', 'dim');
+  if (quit && !dead) t.print('Game abandoned.', 'dim');
   else {
-    t.print(`💀 You hit the wall. Score: ${score} — length: ${snakeArr.length}`, 'err');
+    t.print(`You hit the wall. Score: ${score} — length: ${snakeArr.length}`, 'err');
     t.print(score >= 100 ? 'Nice run. Play again: snake' : 'Try again: snake', 'dim');
   }
 }
@@ -172,7 +172,7 @@ async function g2048(io) {
     t.scrollDown();
     if (board.flat().includes(2048)) {
       over = true;
-      t.print('🏆 2048! You win. Go outside now.', 'ok');
+      t.print('2048 reached. You win. Go outside now.', 'ok');
     } else if (isStuck()) {
       over = true;
       t.print(`Game over. Score: ${score}`, 'err');
@@ -212,7 +212,7 @@ async function g2048(io) {
 /* ── Tic Tac Toe ──────────────────────────────────────────── */
 async function ttt(io) {
   const t = io.term;
-  t.html('<div class="game-head"><b>TIC TAC TOE</b> — you are ✕ · click a square or press 1-9 · quit: q</div>');
+  t.html('<div class="game-head"><b>TIC TAC TOE</b> — you are X · click a square or press 1-9 · quit: q</div>');
 
   const box = t.mount('game-wrap');
   const head = document.createElement('div');
@@ -242,10 +242,10 @@ async function ttt(io) {
   const render = (win) => {
     board.forEach((v, i) => {
       const cell = cells[i];
-      cell.textContent = v === 'X' ? '✕' : v === 'O' ? '◯' : '';
+      cell.textContent = v === 'X' ? 'X' : v === 'O' ? 'O' : '';
       cell.className = 'cell' + (v === 'X' ? ' me' : v === 'O' ? ' ai' : '') + (win?.line?.includes(i) ? ' win' : '');
     });
-    head.textContent = finished ? '' : 'your move ✕';
+    head.textContent = finished ? '' : 'your move (X)';
   };
 
   const minimax = (b, isAi) => {
@@ -278,9 +278,9 @@ async function ttt(io) {
   const finish = (w) => {
     finished = true;
     render(w);
-    if (w.mark === 'X') t.print('🏆 You win. Well played.', 'ok');
-    else if (w.mark === 'O') t.print('🤖 You lose. The computer is not happy, it just calculated.', 'err');
-    else t.print('🤝 A draw.', 'warn');
+    if (w.mark === 'X') t.print('You win. Well played.', 'ok');
+    else if (w.mark === 'O') t.print('You lose. The computer is not happy, it just calculated.', 'err');
+    else t.print('A draw.', 'warn');
     t.print('Play again: ttt', 'dim');
   };
 
@@ -336,14 +336,14 @@ function guess(io) {
         }
         tries++;
         if (n === target) {
-          t.print(`🎉 Correct! It was ${target} — in ${tries} tries.`, 'ok');
+          t.print(`Correct! It was ${target} — in ${tries} tries.`, 'ok');
           t.print(tries <= 5 ? 'That was quick.' : 'Play again: guess', 'dim');
           resolve();
         } else if (tries >= 8) {
           t.print(`Out of tries. It was ${target}. Play again: guess`, 'err');
           resolve();
         } else {
-          t.print(`${n < target ? 'higher ↑' : 'lower ↓'}   (${tries}/8)`, 'warn');
+          t.print(`${n < target ? 'higher' : 'lower'}   (${tries}/8)`, 'warn');
           round();
         }
       });
@@ -402,18 +402,18 @@ function hangman(io) {
         } else {
           if (letters.includes(ch)) {
             if (found.has(ch)) t.print('That letter is already used.', 'warn');
-            else { found.add(ch); t.print(`✓ "${ch}" is in there.`, 'ok'); }
+            else { found.add(ch); t.print(`"${ch}" is in there.`, 'ok'); }
           } else {
             wrong++;
-            t.print(`✗ no "${ch}".`, 'err');
+            t.print(`no "${ch}".`, 'err');
           }
         }
         if (letters.every((c) => found.has(c))) {
           t.print(`  ${letters.join(' ')}`, 'ok');
-          t.print('🎉 You win. Word found.', 'ok');
+          t.print('You win. Word found.', 'ok');
           resolve();
         } else if (wrong >= 6) {
-          t.print(`💀 You lose. The word was: ${word}`, 'err');
+          t.print(`You lose. The word was: ${word}`, 'err');
           t.print('Play again: hangman', 'dim');
           resolve();
         } else if (ch.length > 1 && ![...ch].every((c) => letters.includes(c))) {

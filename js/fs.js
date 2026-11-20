@@ -24,16 +24,17 @@ function defaultRoot() {
         'README.md': file('README.md', `# Welcome to Retro Term
 
 This is a terminal simulator: a real filesystem (inside your browser), real
-shell commands, pipes, redirects, an editor and a pile of hidden secrets.
+shell commands, pipes, redirects, an editor and thirty memories that only
+people who know me can open.
 
 Quick start:
   help        list every command
-  secrets     30 hidden secrets (unlock them one by one)
+  ask         30 memories, one question at a time
   games       play: snake, 2048, ttt, guess, hangman
   nano file   create and edit a file
   theme green switch the phosphor color
 
-Built for a graphic designer. ☕
+Built for a graphic designer.
 `, 2),
         '.bashrc': file('.bashrc', `# ~/.bashrc
 export EDITOR=nano
@@ -41,10 +42,12 @@ export THEME=amber
 alias ll='ls -l'
 alias gs='git status'
 `, 12),
-        '.secrets': file('.secrets', `Three of thirty secrets:
-  1) look at colors with "palette"
-  2) type the name of that famous 1999 film (it goes green)
-  3) one day try "shutdown"
+        '.secrets': file('.secrets', `Three of the thirty memories:
+  1) my brother's name, spelled backwards
+  2) the small city I live in
+  3) what is always next to my keyboard
+
+Type "ask" to be questioned properly. Type "dad" if you get stuck.
 `, 1),
         design: dir('design', {
           'palette.txt': file('palette.txt', `# AMBER DUSK

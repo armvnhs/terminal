@@ -2,7 +2,6 @@
 
 import { FS } from './fs.js';
 import { execute, COMMANDS } from './shell.js';
-import { checkLine, foundCount, totalSecrets } from './secrets.js';
 
 const LS_ENV = 'retroterm.env.v1';
 const LS_ALIAS = 'retroterm.alias.v1';
@@ -390,12 +389,6 @@ export class Terminal {
       this.println(`retro-sh: ${err && err.message ? err.message : 'unknown error'}`, 'err');
     }
 
-    const secret = checkLine(value);
-    if (secret) {
-      this.println('');
-      this.println(`  ✦ Secret unlocked: "${secret.title}"   (${foundCount()}/${totalSecrets()})`, 'ok');
-    }
-
     this.busy = false;
     this.inputLine.classList.remove('hidden');
     this.refreshPrompt();
@@ -557,7 +550,7 @@ export class Terminal {
     this.editorOpen = false;
     this.inputLine.classList.remove('hidden');
     this.println(`${this.promptText()}nano ${this.editingPath}`, 'dim');
-    this.println(`✓ ${this.editingPath} saved (${value.split('\n').length} lines)`, 'ok');
+    this.println(`${this.editingPath} saved (${value.split('\n').length} lines)`, 'ok');
     this.focusInput();
     this.refreshPrompt();
   }
@@ -572,7 +565,7 @@ export class Terminal {
       'RetroOS 1.0 — amber phosphor terminal',
       'retro-kernel 1.0.0 (1984)  ·  x86_64',
       '[  ok  ] mounting virtual filesystem on /',
-      '[  ok  ] loading 30 hidden secrets',
+      '[  ok  ] loading 30 memories',
       '[  ok  ] warming phosphor at 3200K',
       '[  warn ] fan noise module not found',
     ];
@@ -586,8 +579,8 @@ export class Terminal {
     this.println('  │   R E T R O   T E R M   ·   v1.0  (1984)   │', 'bright');
     this.println('  └────────────────────────────────────────────┘', 'bright');
     this.println('');
-    this.println('  A full terminal in your browser — files, folders, pipes, an editor, games and secrets.');
-    this.println('  Type "help" to start. Feeling patient? Type "secrets" and hunt down all 30.');
+    this.println('  A full terminal in your browser — files, folders, pipes, an editor, games and thirty memories.');
+    this.println('  Type "help" to start. Then type "ask": thirty memories are waiting, one question at a time.');
     this.println('');
     this.println(`  history: ${this.history.length} commands saved   ·   theme: ${this.theme}`, 'dim');
     this.println('');

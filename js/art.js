@@ -127,7 +127,7 @@ export const COFFEE = String.raw`
       |      |]
       \      /
        \____/
-   ☕  coffee is ready, designer
+   coffee is ready, designer
 `;
 
 /* ── nyan cat ─────────────────────────────────────────────── */
